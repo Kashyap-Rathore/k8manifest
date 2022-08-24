@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-for-file-as-vol
+  namespace: test-namespace
+data:
+  player_initial_lives=3
+  player_name=Raja
+  motogp-user.yaml: |
+    user.name=alien
+    user.skill=skydiving
+  motogp-data.yaml: |
+    data.player=2
+    data.guns=100

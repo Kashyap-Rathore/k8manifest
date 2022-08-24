@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: maven-app-rc
+  namespace: test-namespace
+spec:
+  replicas: 2
+  selector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values: 
+         - maven-app-pod-rs
+  template:
+    metadata:
+      name: maven-app-pod
+      labels:
+        app: maven-app-pod-rs
+    spec:
+      containers:
+        - name: maven-app-container
+          image: dockerhandson/maven-web-application
+          ports:
+            - containerPort: 80
+          

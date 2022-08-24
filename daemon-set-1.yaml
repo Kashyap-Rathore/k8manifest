@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata: 
+  name: daemon-set-1
+  namespace: test-namespace
+spec:
+  selector:
+    matchLabels:
+      app: nginx-deamon-set-label
+  template:
+    metadata:
+      name: daemon-set-pod
+      labels: 
+        app: nginx-deamon-set-label
+    spec:
+      containers:
+        - name: daemon-set-container
+          image: nginx
+          ports:
+            - containerPort: 8080
+              
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: daemon-set-service
+  namespace: test-namespace
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080

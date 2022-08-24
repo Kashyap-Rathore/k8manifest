@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: spring-boot-configmap
+  namespace: test-namespace
+data:
+  mongousername: 'mongo-db-user'
+  mongopassword: 'mongo-db-password'

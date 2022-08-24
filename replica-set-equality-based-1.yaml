@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: java-app-rs
+  namespace: test-namespace
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: java-app-rs
+  template:
+    metadata:
+      name: java-app-rc-pod
+      labels:
+        app: java-app-rs
+        
+    spec:
+      containers:
+        - name: java-app-container-rc
+          image: dockerhandson/java-web-application:1
+          ports:
+            - containerPort: 8080
+        - name: maven-app-container-rc
+          image: dockerhandson/java-web-application:1
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: replica-set-service
+  namespace: test-namespace
+spec:
+  type: NodePort
+  selector:
+    app: java-app-rs
+  ports:
+    - name: java-port
+      port: 8080
+      targetPort: 8080
+    - name: maven-port
+      port: 80
+      targetPort: 80
+      

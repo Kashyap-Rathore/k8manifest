@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo
+  namespace: test-namespace
+spec:
+  selector:
+    matchLabels:
+      app: mongod-label
+  serviceName: mongod-headless-svc
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: mongod-label
+    spec:
+      terminationGracePeriodSeconds: 10    # it will take 10 seconds between deleting the StatefulSet pod
+      containers:
+      - name: mongod-container
+        image: mongo
+        command:      # equalant to docker run mongo mongod --bind_ip 0.0.0.0 --replSet MainRepSet
+          - "mongod"
+          - “--bind_ip”
+          - “0.0.0.0”
+          - “--replSet”
+          - “MainRepSet”
+        resources:
+          requests:
+            cpu: 200m
+            memory: 200Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        ports:
+        - containerPort: 27017
+          name: mongo
+        volumeMounts:
+        - name: mongo-mount-path
+          mountPath: /data/db
+  volumeClaimTemplates:
+    - metadata:
+        name: mongopvc
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+            requests:
+              storage: 1Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongod-headless-svc
+  namespace: test-namespace
+spec:
+  clusterIP: None                   # Headless Service
+  selector:
+    app: mongod-label
+  ports:
+  - port: 27017
+    targetPort: 27017
+

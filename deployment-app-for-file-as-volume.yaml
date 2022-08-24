@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: configmap-for-file-as-vol
+  namespace: test-namespace
+data:
+  motogp-user.yaml: |
+    name=alien
+    skill=skydiving
+  motogp-data.yaml: |
+    player=2
+    guns=100
+  
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployemnt-java-web-app
+  namespace: test-namespace
+  labels:
+    app: deployment-service-label
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 2
+  selector:
+    matchLabels:
+      app-name: jjpn-deployment-label
+  template:
+    metadata:
+      name: java-python-node-deployment-pods
+      labels:
+        app-name: jjpn-deployment-label
+    spec:
+      containers:
+        - name: java-web-app-container
+          image: dockerhandson/java-web-app:1
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: configfileasvol
+              mountPath: "/usr/local/tomcat/config/" # give the full path you can get the path from the command kubectl exec <pod-name> -n <namespace> -- pwd
+              # below subPath is used if we want to update a file in that case we need to do like this 
+              #mountPath: "/usr/local/tomcat/conf/tomcat-users.xml"
+              #subPath: "tomcat-users.xml"
+           
+      volumes:
+        - name: configfileasvol
+          configMap:
+            name: configmap-for-file-as-vol
+            items:
+              - key: "motogp-user.yaml"
+                path: "motogp-user.yaml"
+              - key: "motogp-data.yaml"
+                path: "motogp-data.yaml"
+          
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-python-app-service-deployment
+  namespace: test-namespace
+spec:
+  type: NodePort
+  selector:
+    app-name: jjpn-deployment-label
+  ports:
+    - name: java-web-app-port 
+      port: 8080
+      targetPort: 8080
+          
+    

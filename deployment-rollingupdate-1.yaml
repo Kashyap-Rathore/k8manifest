@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployemnt-java-web-app
+  namespace: test-namespace
+  labels:
+    app: deployment-service-label
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 2
+  minReadySeconds: 30  
+  selector:
+    matchLabels:
+      app-name: jjpn-deployment-label
+  template:
+    metadata:
+      name: java-python-node-deployment-pods
+      labels:
+        app-name: jjpn-deployment-label
+    spec:
+      containers:
+        - name: java-web-app-container
+          image: dockerhandson/java-web-app:1
+          ports:
+            - containerPort: 8080
+        - name: java-app-container
+          image: dockerhandson/java-web-application:1
+          ports:
+            - containerPort: 80  
+            
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: java-python-app-service-deployment
+  namespace: test-namespace
+spec:
+  type: NodePort
+  selector:
+    app-name: jjpn-deployment-label
+  ports:
+    - name: java-web-app-port 
+      port: 8080
+      targetPort: 8080
+    - name: java-app-port 
+      port: 80
+      targetPort: 80
+          
+    

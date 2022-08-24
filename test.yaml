@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+  labels:
+    owner: Raja
+    team: qa
+  namespace: test-namespace
+spec:
+  containers:
+    - name: c001
+      image: dockerhandson/maven-web-application:1
+      ports:
+        - containerPort: 8080
+      resources:
+        requests:
+          cpu: 200m
+          memory: 200Mi
+        limits:
+          cpu: 400m
+          memory: 400Mi
+        
